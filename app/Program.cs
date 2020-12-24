@@ -12,12 +12,27 @@ namespace App
         public string Name { get; set; }
     }
 
+    public class Hoge
+    {
+        public string Fuga { get; set; }
+        public string Piyo { get; set; }
+    }
+
     public class DroidType : ObjectGraphType<Droid>
     {
         public DroidType()
         {
             Field(x => x.Id).Description("The Id of the Droid.");
             Field(x => x.Name).Description("The name of the Droid.");
+        }
+    }
+
+    public class HogeType : ObjectGraphType<Hoge>
+    {
+        public HogeType()
+        {
+            Field(x => x.Fuga);
+            Field(x => x.Piyo);
         }
     }
 
@@ -29,6 +44,16 @@ namespace App
               "hero",
               resolve: context => new Droid { Id = "1", Name = "R2-D2" }
             );
+
+            Field<HogeType>(
+              "hoge",
+              resolve: context => this.Get()
+            );
+        }
+
+        public Hoge Get()
+        {
+            return new Hoge { Fuga = "Fuga", Piyo = "Piyo" };
         }
     }
 
@@ -40,7 +65,10 @@ namespace App
 
             var json = await schema.ExecuteAsync(_ =>
             {
-                _.Query = "{ hero { id name } }";
+                _.Query = @"{
+                    hero { id name }
+                    hoge { fuga piyo }
+                }";
             });
 
             Console.WriteLine(json);
